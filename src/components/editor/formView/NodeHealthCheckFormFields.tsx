@@ -18,7 +18,6 @@ const MinHealthyField = ({ fieldName }: FormViewFieldProps) => {
   const { t } = useNodeHealthCheckTranslation();
   return (
     <InputField
-      required
       label={t("Min healthy")}
       labelIcon={
         <HelpIcon

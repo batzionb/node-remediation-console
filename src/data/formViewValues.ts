@@ -117,10 +117,14 @@ export const getSpec = (
   formViewFields: FormViewValues
 ): NodeHealthCheckSpec => {
   const { nodeSelector, minHealthy, unhealthyConditions } = formViewFields;
+  const computedMinHealthy =
+    minHealthy && minHealthy.trim() !== ""
+      ? getNodeHealthCheckMinHealthy(minHealthy)
+      : undefined;
   return {
     selector: selectorFromStringArray(nodeSelector),
     unhealthyConditions,
-    minHealthy: getNodeHealthCheckMinHealthy(minHealthy),
+    minHealthy: computedMinHealthy,
     remediationTemplate: !formViewFields.useEscalating
       ? formViewFields.remediator?.template
       : undefined,
