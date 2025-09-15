@@ -47,6 +47,7 @@ export const useDefaultNodeHealthCheck = (): [
         remediationTemplate: defaultRemediator,
         unhealthyConditions: defaultUnhealthyConditions,
         minHealthy: DEFAULT_MIN_HEALTHY,
+        maxUnhealthy: "",
         selector: {},
       },
     };

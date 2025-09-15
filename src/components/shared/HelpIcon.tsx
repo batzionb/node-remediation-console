@@ -2,8 +2,9 @@ import * as React from "react";
 import classNames from "classnames";
 import { Button, Popover } from "@patternfly/react-core";
 import { OutlinedQuestionCircleIcon } from "@patternfly/react-icons";
+
 type PopoverIconProps = {
-  helpText: string;
+  helpText: React.ReactNode;
 };
 
 const HelpIcon: React.FC<PopoverIconProps> = ({ helpText }) => (

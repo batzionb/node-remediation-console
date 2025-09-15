@@ -2,7 +2,7 @@ import {
   selectorFromStringArray,
   selectorToStringArray,
 } from "copiedFromConsole/module/selector";
-import { defaultUnhealthyConditions, DEFAULT_MIN_HEALTHY } from "./defaults";
+import { defaultUnhealthyConditions } from "./defaults";
 import { ParseErrorCode, throwParseError } from "./parseErrors";
 import { getSortedRemediators } from "./remediator";
 import {
@@ -83,9 +83,8 @@ export const getFormViewValues = (
   return {
     name: nodeHealthCheck.metadata?.name,
     nodeSelector: selectorToStringArray(nodeHealthCheck.spec?.selector || {}),
-    minHealthy: (
-      nodeHealthCheck.spec?.minHealthy ?? DEFAULT_MIN_HEALTHY
-    ).toString(),
+    minHealthy: (nodeHealthCheck.spec?.minHealthy ?? "").toString(),
+    maxUnhealthy: (nodeHealthCheck.spec?.maxUnhealthy ?? "").toString(),
     unhealthyConditions: getUnhealthyConditionsValue(nodeHealthCheck),
     remediator: !useEscalating
       ? getRemediationTemplateFormValues(
@@ -101,30 +100,32 @@ export const getFormViewValues = (
   };
 };
 
-export const getNodeHealthCheckMinHealthy = (minHealthy: string) => {
-  let minHealthyVal: string | number = minHealthy;
-  if (
-    minHealthy &&
-    minHealthy.match(MIN_HEALTHY_REGEX) &&
-    !minHealthy.endsWith("%")
-  ) {
-    minHealthyVal = parseInt(minHealthy);
+const parseThreshold = (value: string): string | number => {
+  let parsed: string | number = value;
+  if (value && value.match(MIN_HEALTHY_REGEX) && !value.endsWith("%")) {
+    parsed = parseInt(value);
   }
-  return minHealthyVal;
+  return parsed;
 };
 
 export const getSpec = (
   formViewFields: FormViewValues
 ): NodeHealthCheckSpec => {
-  const { nodeSelector, minHealthy, unhealthyConditions } = formViewFields;
+  const { nodeSelector, minHealthy, maxUnhealthy, unhealthyConditions } =
+    formViewFields;
   const computedMinHealthy =
     minHealthy && minHealthy.trim() !== ""
-      ? getNodeHealthCheckMinHealthy(minHealthy)
+      ? parseThreshold(minHealthy)
+      : undefined;
+  const computedMaxUnhealthy =
+    maxUnhealthy && maxUnhealthy.trim() !== ""
+      ? parseThreshold(maxUnhealthy)
       : undefined;
   return {
     selector: selectorFromStringArray(nodeSelector),
     unhealthyConditions,
     minHealthy: computedMinHealthy,
+    maxUnhealthy: computedMaxUnhealthy,
     remediationTemplate: !formViewFields.useEscalating
       ? formViewFields.remediator?.template
       : undefined,

@@ -66,6 +66,12 @@ const getFormDataSchema = (t: TFunction) =>
       ),
       excludeEmptyString: true,
     }),
+    maxUnhealthy: yup.string().matches(new RegExp(MIN_HEALTHY_REGEX), {
+      message: t(
+        `Expected value is a percentage or a number. For example: 25 or 70%`
+      ),
+      excludeEmptyString: true,
+    }),
     unhealthyConditions: yup.array().of(
       yup.object().shape({
         duration: requiredSchema.concat(

@@ -21,6 +21,11 @@ export const DetailsRightPane: React.FC<{
         obj={nodeHealthCheck}
         path="spec.minHealthy"
       />
+      <DetailsItem
+        label={t("Max unhealthy")}
+        obj={nodeHealthCheck}
+        path="spec.maxUnhealthy"
+      />
 
       <DetailsItem label={t("Observed nodes")} obj={nodeHealthCheck}>
         {nodeHealthCheck.status?.observedNodes}

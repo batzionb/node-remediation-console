@@ -48,6 +48,7 @@ export type NodeHealthCheckSpec = {
   selector?: Selector;
   remediationTemplate?: RemediationTemplate;
   minHealthy?: string | number;
+  maxUnhealthy?: string | number;
   unhealthyConditions?: UnhealthyConditions;
   pauseRequests?: string[];
   escalatingRemediations?: EscalatingRemediator[];
@@ -115,6 +116,7 @@ export type FormViewValues = {
   name: string;
   nodeSelector: string[];
   minHealthy: string;
+  maxUnhealthy: string;
   unhealthyConditions: UnhealthyCondition[];
   remediator?: Remediator;
   escalatingRemediations?: Remediator[];

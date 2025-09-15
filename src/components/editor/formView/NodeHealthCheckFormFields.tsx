@@ -1,6 +1,12 @@
 import * as React from "react";
 import { useFormikContext } from "formik";
-import { Alert, Form, TextInputTypes } from "@patternfly/react-core";
+import {
+  Alert,
+  Form,
+  TextInputTypes,
+  FormSection,
+  Text,
+} from "@patternfly/react-core";
 import InputField from "../../../copiedFromConsole/formik-fields/InputField";
 import NodeSelectionField from "./nodeSelectionField/NodeSelectionField";
 import { FormViewFieldProps } from "./propTypes";
@@ -19,15 +25,35 @@ const MinHealthyField = ({ fieldName }: FormViewFieldProps) => {
   return (
     <InputField
       label={t("Min healthy")}
+      helpText={t("help.thresholdFormat")}
       labelIcon={
         <HelpIcon
           helpText={t(
-            "The minimum percentage or number of nodes that has to be healthy for the remediation to start."
+            `Remediation is allowed if at least "Min healthy" nodes selected by "selector" are healthy. Min healthy should not be used with remediators that delete nodes (e.g. MachineDeletionRemediation), as this breaks the logic for counting healthy and unhealthy nodes.`
           )}
         />
       }
       name={fieldName}
       data-test="min-healthy"
+    />
+  );
+};
+
+const MaxUnhealthyField = ({ fieldName }: FormViewFieldProps) => {
+  const { t } = useNodeHealthCheckTranslation();
+  return (
+    <InputField
+      label={t("Max unhealthy")}
+      helpText={t("help.thresholdFormat")}
+      labelIcon={
+        <HelpIcon
+          helpText={t(
+            `Remediation is allowed if no more than "Max unhealthy" nodes selected by "selector" are unhealthy.`
+          )}
+        />
+      }
+      name={fieldName}
+      data-test="max-unhealthy"
     />
   );
 };
@@ -38,7 +64,7 @@ const NodeHealthCheckFormFields_: React.FC = () => {
   const formViewFieldName = "formData";
   const snrTemplateResult = useSnrTemplate();
   return (
-    <Form className="nhc-form-fields">
+    <Form>
       <Alert
         isInline
         variant="info"
@@ -61,9 +87,22 @@ const NodeHealthCheckFormFields_: React.FC = () => {
       <NodeSelectionField
         fieldName={getObjectItemFieldName([formViewFieldName, "nodeSelector"])}
       />
-      <MinHealthyField
-        fieldName={getObjectItemFieldName([formViewFieldName, "minHealthy"])}
-      />
+      <FormSection title={t("Remediation thresholds")} titleElement="h2">
+        <Text>
+          {t(
+            "Min healthy and Max unhealthy configure the same aspect — specify exactly one (not both)."
+          )}
+        </Text>
+        <MinHealthyField
+          fieldName={getObjectItemFieldName([formViewFieldName, "minHealthy"])}
+        />
+        <MaxUnhealthyField
+          fieldName={getObjectItemFieldName([
+            formViewFieldName,
+            "maxUnhealthy",
+          ])}
+        />
+      </FormSection>
       <UnhealthyConditionsField
         fieldName={getObjectItemFieldName([
           formViewFieldName,
