@@ -1,4 +1,10 @@
-import { FormGroup, Split, SplitItem, Tooltip } from "@patternfly/react-core";
+import {
+  FormGroup,
+  Split,
+  SplitItem,
+  Tooltip,
+  FormHelperText,
+} from "@patternfly/react-core";
 
 import { useField } from "formik";
 
@@ -25,6 +31,8 @@ const RemediatorKindRadioGroup: React.FC<{
 }> = ({ snrTemplatesExist, fieldName, onChange }) => {
   const { t } = useNodeHealthCheckTranslation();
   const fieldId = getFieldId(fieldName, "radiogroup");
+  const [radioField] = useField<RemediatorRadioOption>(fieldName);
+  const isCustom = radioField.value === RemediatorRadioOption.CUSTOM;
   return (
     <FormGroup
       fieldId={fieldId}
@@ -59,6 +67,15 @@ const RemediatorKindRadioGroup: React.FC<{
           />
         </SplitItem>
       </Split>
+      {isCustom && (
+        <FormHelperText>
+          <span>
+            {t(
+              "Choose Kind from namespaced CRDs that define spec.template. If the Kind has multiple API versions, select the API version. Then choose Namespace and Name of an existing Template resource to use for remediation."
+            )}
+          </span>
+        </FormHelperText>
+      )}
     </FormGroup>
   );
 };

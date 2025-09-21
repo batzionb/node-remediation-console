@@ -9,6 +9,7 @@ import {
 } from "@patternfly/react-core";
 import { useField } from "formik";
 import { getFieldId } from "../../copiedFromConsole/formik-fields/field-utils";
+import { TextInput } from "@patternfly/react-core";
 
 export type SelectItem = {
   label: string;
@@ -27,6 +28,10 @@ export type SelectFieldProps = {
   isRequired?: boolean;
   items: (SelectItem | React.ReactElement)[];
   isDisabled?: boolean;
+  isSearchable?: boolean;
+  menuMaxHeightPx?: number;
+  placeholder?: string;
+  onSelect?: (value?: string) => void;
 };
 
 const SelectField: React.FC<SelectFieldProps> = ({
@@ -35,22 +40,46 @@ const SelectField: React.FC<SelectFieldProps> = ({
   isRequired = false,
   items,
   isDisabled = false,
+  isSearchable = true,
+  menuMaxHeightPx = 320,
+  placeholder,
+  onSelect: onSelectCallback,
 }) => {
-  const [{ value }, , { setValue }] = useField(name);
+  const [{ value }, , { setValue }] = useField<string>(name);
   const [isOpen, setIsOpen] = React.useState(false);
+  const [filterText, setFilterText] = React.useState("");
   const fieldId = getFieldId(name, "dropdown");
 
   const onToggle = () => {
     setIsOpen(!isOpen);
   };
 
-  const onSelect = (e, value) => {
+  const handleSelect = (e, selectedValue) => {
     setIsOpen(false);
-    setValue(value);
+    setValue(selectedValue);
+    if (onSelectCallback) {
+      onSelectCallback(selectedValue);
+    }
   };
 
+  const onOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) {
+      setFilterText("");
+    }
+  };
+
+  const normalizedFilter = filterText.trim().toLowerCase();
+  const filteredItems = React.useMemo(() => {
+    if (!isSearchable || !normalizedFilter) return items;
+    return items.filter((item) => {
+      if (isReactElement(item)) return true;
+      return item.label.toLowerCase().includes(normalizedFilter);
+    });
+  }, [items, isSearchable, normalizedFilter]);
+
   const getSelectItems = () => {
-    return items.map((item, idx) => {
+    return filteredItems.map((item, idx) => {
       if (isReactElement(item)) {
         return item;
       }
@@ -73,7 +102,11 @@ const SelectField: React.FC<SelectFieldProps> = ({
     if (selectItem) {
       return selectItem.label;
     }
-    return value;
+    const hasValue = typeof value === "string" && value.length > 0;
+    if (hasValue) {
+      return value;
+    }
+    return placeholder || label || name;
   };
 
   return (
@@ -87,18 +120,31 @@ const SelectField: React.FC<SelectFieldProps> = ({
             isDisabled={isDisabled}
             isExpanded={isOpen}
             style={{
-              width: "200px",
+              width: "100%",
             }}
           >
             {getToggleLabel()}
           </MenuToggle>
         )}
-        onOpenChange={setIsOpen}
-        onSelect={onSelect}
+        onOpenChange={onOpenChange}
+        onSelect={handleSelect}
         isOpen={isOpen}
         readOnly={isDisabled}
       >
-        <SelectList>{getSelectItems()}</SelectList>
+        {isSearchable && (
+          <div style={{ padding: "8px" }}>
+            <TextInput
+              aria-label={`${label || name} search input`}
+              value={filterText}
+              onChange={(_e, val) => setFilterText(val)}
+              placeholder="Search..."
+              isDisabled={isDisabled}
+            />
+          </div>
+        )}
+        <div style={{ maxHeight: `${menuMaxHeightPx}px`, overflowY: "auto" }}>
+          <SelectList>{getSelectItems()}</SelectList>
+        </div>
       </Select>
     </FormGroup>
   );

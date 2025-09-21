@@ -52,6 +52,6 @@
   padding: var(--pf-t--global--spacer--sm) 0;
 }
 
-.nhc-form-fields section {
-  margin-block-start: unset !important;
+.nhc-form-fields {
+  max-width: 50%;
 }
