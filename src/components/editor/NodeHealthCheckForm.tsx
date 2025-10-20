@@ -17,7 +17,6 @@ import { getFormValues, getNodeHealthCheck } from "data/formValues";
 import { LoadingInline } from "copiedFromConsole/utils/status-box";
 import "./nhc-form.css";
 import { useOpenShiftVersion } from "copiedFromConsole/hooks/useOpenShiftVersion";
-import useSnrTemplate from "../../apis/useSNRTemplate";
 import { range } from "lodash-es";
 import { Flex, FlexItem, PageSection, Skeleton } from "@patternfly/react-core";
 export interface NodeHealthCheckProps {
@@ -83,13 +82,12 @@ const NodeHealthCheckForm__: React.FC<NodeHealthCheckProps> = ({
   isCreateFlow,
 }) => {
   const { t } = useNodeHealthCheckTranslation();
-  const [snrTemplate, loaded] = useSnrTemplate();
   const initialValues = React.useMemo(() => {
     if (!loaded) {
       return undefined;
     }
-    return getFormValues(nodeHealthCheck, isCreateFlow, snrTemplate);
-  }, [isCreateFlow, loaded, nodeHealthCheck, snrTemplate]);
+    return getFormValues(nodeHealthCheck, isCreateFlow);
+  }, [isCreateFlow, loaded, nodeHealthCheck]);
 
   const navigation = useNodeHealthCheckNavigation();
 

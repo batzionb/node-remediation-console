@@ -76,8 +76,7 @@ const getescalatingRemediationsFormValues = (
 };
 
 export const getFormViewValues = (
-  nodeHealthCheck: NodeHealthCheck,
-  snrTemplate: RemediationTemplate | undefined
+  nodeHealthCheck: NodeHealthCheck
 ): FormViewValues => {
   const useEscalating = !!nodeHealthCheck.spec?.escalatingRemediations;
   return {

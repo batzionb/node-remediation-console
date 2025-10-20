@@ -1,4 +1,3 @@
-import useSnrTemplate from "apis/useSNRTemplate";
 import * as React from "react";
 import { getNodeHealthCheckApiVersion, nodeHealthCheckKind } from "./model";
 import { getEmptyRemediationTemplate } from "./remediator";
