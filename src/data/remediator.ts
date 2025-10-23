@@ -3,12 +3,8 @@ import {
   NodeHealthCheck,
   RemediationTemplate,
   Remediator,
-  RemediatorRadioOption,
 } from "./types";
-import { snrTemplateKind } from "./model";
 import { TFunction } from "i18next";
-
-export const getSNRLabel = (t: TFunction) => t("Self node remediation");
 
 export const getEmptyRemediationTemplate = (): RemediationTemplate => ({
   apiVersion: "",
@@ -32,19 +28,12 @@ export const getRemediatorLabel = (
     return t("Escalating remediations");
   }
   const remediationTemplate = nodeHealthCheck.spec.remediationTemplate;
-  return remediationTemplate.kind === snrTemplateKind.kind
-    ? getSNRLabel(t)
-    : remediationTemplate.kind;
+  return remediationTemplate.kind;
 };
 
-export const getDefaultRemediator = (
-  snrTemplate: RemediationTemplate | undefined
-): Remediator => {
+export const getDefaultRemediator = (): Remediator => {
   return {
-    radioOption: snrTemplate
-      ? RemediatorRadioOption.SNR
-      : RemediatorRadioOption.CUSTOM,
-    template: snrTemplate ? snrTemplate : getEmptyRemediationTemplate(),
+    template: getEmptyRemediationTemplate(),
     order: "",
     id: Math.random(),
   };

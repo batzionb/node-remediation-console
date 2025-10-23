@@ -13,9 +13,9 @@ import {
   getEmptyRemediationTemplate,
   getSortedRemediators,
 } from "../../../../data/remediator";
-import { Remediator, RemediatorRadioOption } from "../../../../data/types";
+import { Remediator } from "../../../../data/types";
 import { useNodeHealthCheckTranslation } from "../../../../localization/useNodeHealthCheckTranslation";
-import RemediatorField from "./RemediatorField";
+import RemediationTemplate from "./RemediationTemplate";
 import { DragDrop, Draggable, Droppable } from "@patternfly/react-core";
 import { WithRemoveButton } from "../../../shared/WithRemoveButton";
 import { GripVerticalIcon, InfoCircleIcon } from "@patternfly/react-icons";
@@ -149,7 +149,7 @@ const SingleRemediatorField = ({
               onToggle={() => toggleExpand(index)}
             >
               <>
-                <RemediatorField fieldName={`${fieldName}`} />
+                <RemediationTemplate fieldName={`${fieldName}`} />
                 <TimeoutField fieldName={`${fieldName}.timeout`} />
                 <OrderField
                   fieldName={`${fieldName}.order`}
@@ -169,6 +169,7 @@ interface SourceType {
   droppableId: string;
   index: number;
 }
+
 type DestinationType = SourceType;
 
 const reorder = (list: Remediator[], startIndex: number, endIndex: number) => {
@@ -192,7 +193,7 @@ const getExpanded = (
   return ret;
 };
 
-const RemediatorsArrayFieldContent = ({
+const EscalatingRemediationsFieldContent = ({
   push,
   remove,
   fieldName,
@@ -201,11 +202,27 @@ const RemediatorsArrayFieldContent = ({
 }) => {
   const [{ value: remediators }, , { setValue: setRemediators }] =
     useField<Remediator[]>(fieldName);
-  const { t } = useNodeHealthCheckTranslation();
 
   const [expanded, setExpanded] = React.useState<Record<number, boolean>>(
     getExpanded(remediators || [], remediators?.length === 1)
   );
+
+  React.useEffect(() => {
+    if (!remediators || remediators.length === 0) {
+      const id = Math.random();
+      setRemediators([
+        {
+          template: getEmptyRemediationTemplate(),
+          order: 0,
+          id,
+        },
+      ]);
+      setExpanded({
+        [id]: true,
+      });
+    }
+  }, [remediators, setRemediators]);
+  const { t } = useNodeHealthCheckTranslation();
 
   const onOrderFieldChange = (id: number) => {
     const newRemediators = getSortedRemediators(remediators);
@@ -232,7 +249,6 @@ const RemediatorsArrayFieldContent = ({
   const onAdd = () => {
     const prevRemediatorOrder = remediators[remediators.length - 1]?.order;
     const newRemediator: Remediator = {
-      radioOption: RemediatorRadioOption.CUSTOM,
       template: getEmptyRemediationTemplate(),
       order: (prevRemediatorOrder || 0) + 1,
       id: Math.random(),
@@ -276,17 +292,20 @@ const RemediatorsArrayFieldContent = ({
   );
 };
 
-const RemediatorsArrayField = () => {
+const EscalatingRemediationsField = () => {
   const fieldName = "formData.escalatingRemediations";
   return (
     <FieldArray name={fieldName} validateOnChange={false}>
       {(props) => {
         return (
-          <RemediatorsArrayFieldContent fieldName={fieldName} {...props} />
+          <EscalatingRemediationsFieldContent
+            fieldName={fieldName}
+            {...props}
+          />
         );
       }}
     </FieldArray>
   );
 };
 
-export default RemediatorsArrayField;
+export default EscalatingRemediationsField;

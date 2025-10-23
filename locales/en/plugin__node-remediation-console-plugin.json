@@ -50,7 +50,7 @@
   "Remediation": "Remediation",
   "Rearrange the templates using drag and drop or by editing the ‘Order’ field. The remediations will be executed in the specified order.": "Rearrange the templates using drag and drop or by editing the ‘Order’ field. The remediations will be executed in the specified order.",
   "Remediation template": "Remediation template",
-  "Self node remediation is disabled because its templates can't be found. Please reinstall the Self Node Remediation Operator.": "Self node remediation is disabled because its templates can't be found. Please reinstall the Self Node Remediation Operator.",
+
   "Other": "Other",
   "Choose API version and Kind (namespaced CRDs with spec.template), then Namespace and Name of an existing Template resource to use as the remediation template.": "Choose API version and Kind (namespaced CRDs with spec.template), then Namespace and Name of an existing Template resource to use as the remediation template.",
   "Name of remediation template": "Name of remediation template",
@@ -139,7 +139,7 @@
   "Please <2>try again</2>.": "Please <2>try again</2>.",
   "Worker": "Worker",
   "Control plane": "Control plane",
-  "Self node remediation": "Self node remediation",
+
   "Escalating remediations": "Escalating remediations",
   "1-{{max}} characters": "1-{{max}} characters",
   "Must be unique": "Must be unique",

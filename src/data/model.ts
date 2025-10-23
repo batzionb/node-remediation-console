@@ -52,15 +52,7 @@ export const namespaceKind: ExtensionK8sKindVersionModel = {
   version: "v1",
 };
 
-export const snrTemplateKind: ExtensionK8sModel = {
-  kind: "SelfNodeRemediationTemplate",
-  group: "self-node-remediation.medik8s.io",
-  version: "v1alpha1",
-};
-
-export const snrTemplateStringKind = getStringKind(snrTemplateKind);
-
-export const getSnrTemplateApiVersion = () => getApiVersion(snrTemplateKind);
+// SNR kinds removed; Self Node Remediation is no longer supported
 
 export const clusterVersionKind: ExtensionK8sModel = {
   group: "config.openshift.io",

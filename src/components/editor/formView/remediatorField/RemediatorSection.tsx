@@ -4,8 +4,8 @@ import * as React from "react";
 import { NodeHealthCheckFormValues } from "../../../../data/types";
 import { useNodeHealthCheckTranslation } from "../../../../localization/useNodeHealthCheckTranslation";
 import CheckboxField from "../../../shared/CheckboxField";
-import RemediatorField from "./RemediatorField";
-import RemediatorsArrayField from "./RemediatorsArrayField";
+import RemediationTemplate from "./RemediationTemplate";
+import EscalatingRemediationsField from "./EscalatingRemediationsField";
 
 const UseEscalatingField = () => {
   const { t } = useNodeHealthCheckTranslation();
@@ -17,7 +17,7 @@ const UseEscalatingField = () => {
   );
 };
 
-const RemediationTemplateField = () => {
+const RemediatorSection = () => {
   const { t } = useNodeHealthCheckTranslation();
   const { values } = useFormikContext<NodeHealthCheckFormValues>();
 
@@ -26,7 +26,7 @@ const RemediationTemplateField = () => {
       <FormGroup>
         <UseEscalatingField />
         {!values.formData.useEscalating && (
-          <RemediatorField fieldName={"formData.remediator"} />
+          <RemediationTemplate fieldName={"formData.remediator"} />
         )}
         {values.formData.useEscalating && (
           <>
@@ -35,7 +35,7 @@ const RemediationTemplateField = () => {
                 "Rearrange the templates using drag and drop or by editing the ‘Order’ field. The remediations will be executed in the specified order."
               )}
             </Text>
-            <RemediatorsArrayField />
+            <EscalatingRemediationsField />
           </>
         )}
       </FormGroup>
@@ -43,4 +43,4 @@ const RemediationTemplateField = () => {
   );
 };
 
-export default RemediationTemplateField;
+export default RemediatorSection;

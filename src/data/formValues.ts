@@ -4,7 +4,6 @@ import {
   FormViewValues,
   NodeHealthCheck,
   NodeHealthCheckFormValues,
-  RemediationTemplate,
 } from "./types";
 import { dump } from "js-yaml";
 import { isParseError } from "./parseErrors";

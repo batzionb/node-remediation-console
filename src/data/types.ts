@@ -93,13 +93,7 @@ export enum TimeUnit {
   MilliSecond = "ms",
 }
 
-export enum RemediatorRadioOption {
-  SNR = "snr",
-  CUSTOM = "custom",
-}
-
 export type Remediator = {
-  radioOption: RemediatorRadioOption;
   template: RemediationTemplate;
   timeout?: string;
   order: number | "";
@@ -143,14 +137,4 @@ export type MachineHealthCheckKind = K8sResourceCommon & {
   };
 };
 
-export type SelfNodeRemediationTemplate = K8sResourceCommon & {
-  spec?: {
-    template?: {
-      spec?: {
-        remediationStrategy: string;
-      };
-    };
-  };
-};
-
-export type SnrTemplateResult = [RemediationTemplate | undefined, boolean];
+// SNR-related types removed as Self Node Remediation is no longer supported

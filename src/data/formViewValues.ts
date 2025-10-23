@@ -9,17 +9,15 @@ import {
   UnhealthyCondition,
   NodeHealthCheck,
   FormViewValues,
-  RemediatorRadioOption,
   RemediationTemplate,
   Remediator,
   NodeHealthCheckSpec,
   EscalatingRemediator,
 } from "./types";
 import { MIN_HEALTHY_REGEX } from "./validationSchema";
-import { isEqual } from "lodash-es";
+//
 
 const getRemediationTemplateFormValues = (
-  snrTemplate: RemediationTemplate | undefined,
   template?: RemediationTemplate,
   timeout?: string,
   order?: number
@@ -27,11 +25,7 @@ const getRemediationTemplateFormValues = (
   if (!template) {
     return undefined;
   }
-  const radioOption = isEqual(snrTemplate, template)
-    ? RemediatorRadioOption.SNR
-    : RemediatorRadioOption.CUSTOM;
   return {
-    radioOption,
     template,
     timeout,
     order: order ?? "",
@@ -58,8 +52,7 @@ const getUnhealthyConditionsValue = (
 };
 
 const getescalatingRemediationsFormValues = (
-  escalatingRemediations?: EscalatingRemediator[],
-  snrTemplate?: RemediationTemplate
+  escalatingRemediations?: EscalatingRemediator[]
 ): Remediator[] => {
   if (!escalatingRemediations) return [];
   const sortedescalatingRemediations = getSortedRemediators(
@@ -67,7 +60,6 @@ const getescalatingRemediationsFormValues = (
   );
   return sortedescalatingRemediations.map((remediator) => {
     return getRemediationTemplateFormValues(
-      snrTemplate,
       remediator.remediationTemplate,
       remediator.timeout,
       remediator.order
@@ -88,13 +80,11 @@ export const getFormViewValues = (
     unhealthyConditions: getUnhealthyConditionsValue(nodeHealthCheck),
     remediator: !useEscalating
       ? getRemediationTemplateFormValues(
-          snrTemplate,
           nodeHealthCheck?.spec?.remediationTemplate
         )
       : undefined,
     escalatingRemediations: getescalatingRemediationsFormValues(
-      nodeHealthCheck.spec?.escalatingRemediations,
-      snrTemplate
+      nodeHealthCheck.spec?.escalatingRemediations
     ),
     useEscalating: !!nodeHealthCheck.spec?.escalatingRemediations,
   };

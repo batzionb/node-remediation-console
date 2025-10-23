@@ -26,16 +26,12 @@ export const useDefaultNodeHealthCheck = (): [
   InitialNodeHealthCheck | undefined,
   boolean
 ] => {
-  const [snrTemplate, loaded] = useSnrTemplate();
+  // No SNR; defaults are immediately available
+  const loaded = true;
   const defaultNodeHealthCheck = React.useMemo<
     InitialNodeHealthCheck | undefined
   >(() => {
-    if (!loaded) {
-      return undefined;
-    }
-    const defaultRemediator = snrTemplate
-      ? snrTemplate
-      : getEmptyRemediationTemplate();
+    const defaultRemediator = getEmptyRemediationTemplate();
     return {
       apiVersion: getNodeHealthCheckApiVersion(),
       kind: nodeHealthCheckKind.kind,
@@ -49,6 +45,6 @@ export const useDefaultNodeHealthCheck = (): [
         selector: {},
       },
     };
-  }, [snrTemplate, loaded]);
+  }, []);
   return [defaultNodeHealthCheck, loaded];
 };

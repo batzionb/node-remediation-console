@@ -10,7 +10,7 @@ import HelpIcon from "components/shared/HelpIcon";
 import { getObjectItemFieldName } from "../../shared/formik-utils";
 import { NodeHealthCheckFormValues } from "../../../data/types";
 import { useNodeHealthCheckTranslation } from "../../../localization/useNodeHealthCheckTranslation";
-import RemediationTemplateField from "./remediatorField/RemediationTemplateField";
+import RemediatorSection from "./remediatorField/RemediatorSection";
 import "../../editor/nhc-form.css";
 
 const MinHealthyField = ({ fieldName }: FormViewFieldProps) => {
@@ -55,7 +55,7 @@ const NodeHealthCheckFormFields_: React.FC = () => {
         data-test="NodeHealthCheck-name"
         helpText={t("A unique name for the NodeHealthCheck")}
       />
-      <RemediationTemplateField />
+      <RemediatorSection />
 
       <NodeSelectionField
         fieldName={getObjectItemFieldName([formViewFieldName, "nodeSelector"])}
