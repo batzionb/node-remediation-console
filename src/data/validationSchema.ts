@@ -22,7 +22,7 @@ export const nameValidationMessages = (t: TFunction) => ({
 
 const requiredSchema = yup.string().required("Required");
 
-const remediatorSchema = yup.object({
+const remediatorTemplateSchema = yup.object({
   apiVersion: requiredSchema,
   kind: requiredSchema,
   name: requiredSchema,
@@ -80,13 +80,15 @@ const getFormDataSchema = (t: TFunction) =>
     ),
     remediator: yup.object().when("useEscalating", {
       is: false,
-      then: yup.object().shape({ template: remediatorSchema }),
+      then: yup.object().shape({
+        template: remediatorTemplateSchema,
+      }),
     }),
     escalatingRemediations: yup.array().when("useEscalating", {
       is: true,
       then: yup.array().of(
         yup.object().shape({
-          template: remediatorSchema,
+          template: remediatorTemplateSchema,
           timeout: requiredSchema.concat(
             yup.string().matches(new RegExp(DURATION_REGEX), {
               message: `${t(

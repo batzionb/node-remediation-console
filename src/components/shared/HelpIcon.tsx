@@ -3,11 +3,12 @@ import classNames from "classnames";
 import { Button, Popover } from "@patternfly/react-core";
 import { OutlinedQuestionCircleIcon } from "@patternfly/react-icons";
 type PopoverIconProps = {
-  helpText: string;
+  helpText?: string;
+  helpContent?: React.ReactNode;
 };
 
-const HelpIcon: React.FC<PopoverIconProps> = ({ helpText }) => (
-  <Popover bodyContent={helpText}>
+const HelpIcon: React.FC<PopoverIconProps> = ({ helpText, helpContent }) => (
+  <Popover bodyContent={helpContent ?? helpText}>
     <Button
       variant="plain"
       onClick={(e) => e.preventDefault()}

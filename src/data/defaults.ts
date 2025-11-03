@@ -1,4 +1,3 @@
-import * as React from "react";
 import { getNodeHealthCheckApiVersion, nodeHealthCheckKind } from "./model";
 import { getEmptyRemediationTemplate } from "./remediator";
 import {
@@ -22,29 +21,19 @@ export const defaultUnhealthyConditions: UnhealthyConditions = [
   },
 ];
 
-export const useDefaultNodeHealthCheck = (): [
-  InitialNodeHealthCheck | undefined,
-  boolean
-] => {
-  // No SNR; defaults are immediately available
-  const loaded = true;
-  const defaultNodeHealthCheck = React.useMemo<
-    InitialNodeHealthCheck | undefined
-  >(() => {
-    const defaultRemediator = getEmptyRemediationTemplate();
-    return {
-      apiVersion: getNodeHealthCheckApiVersion(),
-      kind: nodeHealthCheckKind.kind,
-      metadata: {
-        name: "",
-      },
-      spec: {
-        remediationTemplate: defaultRemediator,
-        unhealthyConditions: defaultUnhealthyConditions,
-        minHealthy: DEFAULT_MIN_HEALTHY,
-        selector: {},
-      },
-    };
-  }, []);
-  return [defaultNodeHealthCheck, loaded];
+export const getDefaultNodeHealthCheck = (): InitialNodeHealthCheck => {
+  const defaultRemediator = getEmptyRemediationTemplate();
+  return {
+    apiVersion: getNodeHealthCheckApiVersion(),
+    kind: nodeHealthCheckKind.kind,
+    metadata: {
+      name: "",
+    },
+    spec: {
+      remediationTemplate: defaultRemediator,
+      unhealthyConditions: defaultUnhealthyConditions,
+      minHealthy: DEFAULT_MIN_HEALTHY,
+      selector: {},
+    },
+  };
 };

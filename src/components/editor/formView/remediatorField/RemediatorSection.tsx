@@ -6,6 +6,8 @@ import { useNodeHealthCheckTranslation } from "../../../../localization/useNodeH
 import CheckboxField from "../../../shared/CheckboxField";
 import RemediationTemplate from "./RemediationTemplate";
 import EscalatingRemediationsField from "./EscalatingRemediationsField";
+import HelpIcon from "../../../shared/HelpIcon";
+import RemediationHelp from "./RemediationHelp";
 
 const UseEscalatingField = () => {
   const { t } = useNodeHealthCheckTranslation();
@@ -22,7 +24,14 @@ const RemediatorSection = () => {
   const { values } = useFormikContext<NodeHealthCheckFormValues>();
 
   return (
-    <FormSection title={t("Remediation")} titleElement="h2">
+    <FormSection
+      title={
+        <>
+          {t("Remediation")} <HelpIcon helpContent={<RemediationHelp />} />
+        </>
+      }
+      titleElement="h2"
+    >
       <FormGroup>
         <UseEscalatingField />
         {!values.formData.useEscalating && (

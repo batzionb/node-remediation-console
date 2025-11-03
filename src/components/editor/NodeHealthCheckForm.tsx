@@ -17,7 +17,7 @@ import { getFormValues, getNodeHealthCheck } from "data/formValues";
 import { LoadingInline } from "copiedFromConsole/utils/status-box";
 import "./nhc-form.css";
 import { useOpenShiftVersion } from "copiedFromConsole/hooks/useOpenShiftVersion";
-import { Flex, FlexItem, PageSection } from "@patternfly/react-core";
+import { Flex, FlexItem, PageSection, Button } from "@patternfly/react-core";
 export interface NodeHealthCheckProps {
   title: string;
   name: string;
@@ -43,9 +43,16 @@ const LearnMoreLink: React.FC = () => {
   }
   const learnMoreLink = `https://docs.openshift.com/container-platform/${version}/nodes/nodes/eco-node-health-check-operator.html`;
   return (
-    <a href={learnMoreLink} target="_blank" rel="noopener noreferrer">
+    <Button
+      variant="link"
+      component="a"
+      href={learnMoreLink}
+      target="_blank"
+      rel="noopener noreferrer"
+      isInline
+    >
       {t("Learn more")} <ExternalLinkAltIcon />
-    </a>
+    </Button>
   );
 };
 

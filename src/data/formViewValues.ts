@@ -17,6 +17,19 @@ import {
 import { MIN_HEALTHY_REGEX } from "./validationSchema";
 //
 
+const getSingleRemediatorFormValues = (
+  template?: RemediationTemplate
+): Remediator | undefined => {
+  if (!template) {
+    return undefined;
+  }
+  return {
+    template,
+    order: "",
+    id: Math.random(),
+  };
+};
+
 const getRemediationTemplateFormValues = (
   template?: RemediationTemplate,
   timeout?: string,
@@ -79,7 +92,7 @@ export const getFormViewValues = (
     ).toString(),
     unhealthyConditions: getUnhealthyConditionsValue(nodeHealthCheck),
     remediator: !useEscalating
-      ? getRemediationTemplateFormValues(
+      ? getSingleRemediatorFormValues(
           nodeHealthCheck?.spec?.remediationTemplate
         )
       : undefined,
@@ -102,6 +115,22 @@ export const getNodeHealthCheckMinHealthy = (minHealthy: string) => {
   return minHealthyVal;
 };
 
+const convertTemplateFromFormView = (
+  template?: RemediationTemplate
+): RemediationTemplate | undefined => {
+  if (!template) return undefined;
+  return template;
+};
+
+const convertSingleRemediatorFromFormView = (
+  remediator?: Remediator
+): RemediationTemplate | undefined => {
+  if (!remediator?.template) {
+    return undefined;
+  }
+  return remediator.template;
+};
+
 export const getSpec = (
   formViewFields: FormViewValues
 ): NodeHealthCheckSpec => {
@@ -111,11 +140,11 @@ export const getSpec = (
     unhealthyConditions,
     minHealthy: getNodeHealthCheckMinHealthy(minHealthy),
     remediationTemplate: !formViewFields.useEscalating
-      ? formViewFields.remediator?.template
+      ? convertSingleRemediatorFromFormView(formViewFields.remediator)
       : undefined,
     escalatingRemediations: formViewFields.useEscalating
       ? formViewFields.escalatingRemediations?.map((remediator) => ({
-          remediationTemplate: remediator.template,
+          remediationTemplate: convertTemplateFromFormView(remediator.template),
           order: remediator.order === "" ? undefined : remediator.order,
           timeout: remediator.timeout,
         }))

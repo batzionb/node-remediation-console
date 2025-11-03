@@ -6,14 +6,19 @@ import {
   Select,
   SelectList,
   SelectOption,
+  TextInput,
 } from "@patternfly/react-core";
 import { useField } from "formik";
 import { getFieldId } from "../../copiedFromConsole/formik-fields/field-utils";
-import { TextInput } from "@patternfly/react-core";
 
 export type SelectItem = {
   label: string;
   value: string;
+  description?: string;
+  apiVersion?: string;
+  kind?: string;
+  namespace?: string;
+  name?: string;
 };
 
 const isReactElement = (
@@ -31,7 +36,8 @@ export type SelectFieldProps = {
   isSearchable?: boolean;
   menuMaxHeightPx?: number;
   placeholder?: string;
-  onSelect?: (value?: string) => void;
+  onSelect?: (value?: string, item?: SelectItem) => void;
+  selectedItem?: SelectItem;
 };
 
 const SelectField: React.FC<SelectFieldProps> = ({
@@ -44,6 +50,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
   menuMaxHeightPx = 320,
   placeholder,
   onSelect: onSelectCallback,
+  selectedItem,
 }) => {
   const [{ value }, , { setValue }] = useField<string>(name);
   const [isOpen, setIsOpen] = React.useState(false);
@@ -54,11 +61,17 @@ const SelectField: React.FC<SelectFieldProps> = ({
     setIsOpen(!isOpen);
   };
 
-  const handleSelect = (e, selectedValue) => {
+  const handleSelect = (
+    e: React.MouseEvent | React.ChangeEvent,
+    selectedValue: string
+  ) => {
     setIsOpen(false);
     setValue(selectedValue);
     if (onSelectCallback) {
-      onSelectCallback(selectedValue);
+      const selectedItem = items.find(
+        (item) => !isReactElement(item) && item.value === selectedValue
+      ) as SelectItem | undefined;
+      onSelectCallback(selectedValue, selectedItem);
     }
   };
 
@@ -83,11 +96,16 @@ const SelectField: React.FC<SelectFieldProps> = ({
       if (isReactElement(item)) {
         return item;
       }
+      const isSelected = selectedItem
+        ? item === selectedItem
+        : item.value === value;
       return (
         <SelectOption
           key={idx}
           data-test={`select-${item.label}`}
           value={item.value}
+          description={item.description}
+          isSelected={isSelected}
         >
           {item.label}
         </SelectOption>
@@ -96,9 +114,11 @@ const SelectField: React.FC<SelectFieldProps> = ({
   };
 
   const getToggleLabel = () => {
-    const selectItem = items.find(
-      (item) => !isReactElement(item) && item.value === value
-    ) as SelectItem;
+    const selectItem = selectedItem
+      ? selectedItem
+      : (items.find(
+          (item) => !isReactElement(item) && item.value === value
+        ) as SelectItem);
     if (selectItem) {
       return selectItem.label;
     }

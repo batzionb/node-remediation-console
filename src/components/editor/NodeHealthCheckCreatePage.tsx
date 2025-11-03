@@ -1,11 +1,14 @@
-import { useDefaultNodeHealthCheck } from "data/defaults";
+import { getDefaultNodeHealthCheck } from "data/defaults";
 import { useNodeHealthCheckTranslation } from "localization/useNodeHealthCheckTranslation";
 import * as React from "react";
 import NodeHealthCheckForm from "./NodeHealthCheckForm";
 
 const NodeHealthCheckCreatePage = () => {
   const { t } = useNodeHealthCheckTranslation();
-  const [defaultNodeHealthCheck] = useDefaultNodeHealthCheck();
+  const defaultNodeHealthCheck = React.useMemo(
+    () => getDefaultNodeHealthCheck(),
+    []
+  );
 
   return (
     <NodeHealthCheckForm

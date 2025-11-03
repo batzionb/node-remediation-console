@@ -16,6 +16,7 @@ export type TemplateCapableVersion = {
   kind: string;
 };
 
+// Returns: CRDs that can be used as templates for remediations
 const useTemplateCapableCRDs = (): [
   TemplateCapableVersion[],
   boolean,
@@ -29,9 +30,8 @@ const useTemplateCapableCRDs = (): [
     const out: TemplateCapableVersion[] = [];
     for (const crd of crds) {
       const group = crd?.spec?.group;
-      const scope = crd?.spec?.scope;
       const kind = crd?.spec?.names?.kind;
-      if (!group || !kind || scope !== "Namespaced") continue;
+      if (!group || !kind) continue;
 
       const versions = crd?.spec?.versions || [];
       for (const v of versions) {
