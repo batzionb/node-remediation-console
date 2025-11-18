@@ -1,30 +1,69 @@
-import { FormGroup, Split, SplitItem, Tooltip } from "@patternfly/react-core";
-
+import {
+  FormGroup,
+  Split,
+  SplitItem,
+  Popover,
+  Button,
+  Stack,
+  StackItem,
+  Text,
+  Flex,
+  FlexItem,
+} from "@patternfly/react-core";
 import { useField } from "formik";
-
 import * as React from "react";
-
+import { Link } from "react-router-dom";
 import { withFallback } from "../../../../copiedFromConsole/error";
 import { getFieldId } from "../../../../copiedFromConsole/formik-fields/field-utils";
 import RadioButtonField from "../../../../copiedFromConsole/formik-fields/RadioButtonField";
-import {
-  getSNRLabel,
-  getEmptyRemediationTemplate,
-} from "../../../../data/remediator";
-import {
-  RemediatorRadioOption,
-  Remediator,
-  RemediationTemplate,
-} from "../../../../data/types";
+import { getEmptyRemediationTemplate } from "../../../../data/remediator";
+import { Remediator } from "../../../../data/types";
+import { RemediatorRadioOptionId } from "../../../../data/remediators";
 import { useNodeHealthCheckTranslation } from "../../../../localization/useNodeHealthCheckTranslation";
+import useRemediators, {
+  RemediatorInfo,
+} from "../../../../apis/useRemediators";
+import { getOperatorHubLink } from "../../../../data/remediators";
+import HelpIcon from "../../../shared/HelpIcon";
 
 const RemediatorKindRadioGroup: React.FC<{
-  snrTemplatesExist: boolean;
   fieldName: string;
-  onChange: (kind: RemediatorRadioOption) => void;
-}> = ({ snrTemplatesExist, fieldName, onChange }) => {
+  onChange: (kind: RemediatorRadioOptionId) => void;
+}> = ({ fieldName, onChange }) => {
   const { t } = useNodeHealthCheckTranslation();
+  const remediators = useRemediators();
   const fieldId = getFieldId(fieldName, "radiogroup");
+
+  const getRemediatorPopoverContent = (
+    remediator: RemediatorInfo
+  ): React.ReactNode | undefined => {
+    if (remediator.installed) {
+      return undefined;
+    }
+
+    const message = t(
+      "{{name}} is not installed. Install the operator to use this remediation type.",
+      { name: remediator.name }
+    );
+
+    const installHref = getOperatorHubLink(remediator.name);
+
+    return (
+      <Stack>
+        <StackItem>
+          <Text>{message}</Text>
+        </StackItem>
+        <StackItem>
+          <Link to={installHref} target="_blank" rel="noopener noreferrer">
+            <Button variant="link" isInline>
+              {t("Install {{name}}", { name: remediator.name })}
+            </Button>
+          </Link>
+        </StackItem>
+      </Stack>
+    );
+  };
+
   return (
     <FormGroup
       fieldId={fieldId}
@@ -32,72 +71,71 @@ const RemediatorKindRadioGroup: React.FC<{
       isInline={true}
     >
       <Split hasGutter>
-        <SplitItem>
-          <Tooltip
-            content={t(
-              "Self node remediation is disabled because its templates can't be found. Please reinstall the Self Node Remediation Operator."
-            )}
-            hidden={snrTemplatesExist}
-          >
+        {remediators.map((remediator) => {
+          const popoverContent = getRemediatorPopoverContent(remediator);
+          const radioButton = (
             <RadioButtonField
-              value={RemediatorRadioOption.SNR}
-              label={getSNRLabel(t)}
-              isDisabled={!snrTemplatesExist}
-              aria-describedby={"SNR remediator kind"}
+              value={remediator.id}
+              label={remediator.name}
+              isDisabled={!remediator.installed}
+              aria-describedby={`${remediator.id} remediator kind`}
               name={fieldName}
               onChange={onChange}
             />
-          </Tooltip>
-        </SplitItem>
-        <SplitItem>
-          <RadioButtonField
-            value={RemediatorRadioOption.CUSTOM}
-            label={t("Other")}
-            aria-describedby={"CUSTOM remediator kind"}
-            name={fieldName}
-            onChange={onChange}
-          />
-        </SplitItem>
+          );
+
+          const radioButtonWithHelp = (
+            <Flex
+              direction={{ default: "row" }}
+              spaceItems={{ default: "spaceItemsXs" }}
+              alignItems={{ default: "alignItemsCenter" }}
+            >
+              <FlexItem>
+                {popoverContent ? (
+                  <Popover
+                    bodyContent={popoverContent}
+                    position="top"
+                    triggerAction="hover"
+                  >
+                    <div style={{ display: "inline-block" }}>{radioButton}</div>
+                  </Popover>
+                ) : (
+                  radioButton
+                )}
+              </FlexItem>
+              <FlexItem>
+                <HelpIcon helpText={remediator.description} />
+              </FlexItem>
+            </Flex>
+          );
+
+          return (
+            <SplitItem key={remediator.id}>{radioButtonWithHelp}</SplitItem>
+          );
+        })}
       </Split>
     </FormGroup>
   );
 };
 
-const RemediatorKindField_ = ({
-  fieldName,
-  snrTemplate,
-}: {
-  fieldName: string;
-  snrTemplate: RemediationTemplate | undefined;
-}) => {
+const RemediatorKindField_ = ({ fieldName }: { fieldName: string }) => {
   const [{ value }, , { setValue: setRemediator }] =
     useField<Remediator>(fieldName);
 
-  const setCustomRemediator = () => {
+  const onChange = (kind: RemediatorRadioOptionId) => {
+    // When changing remediator kind, reset template to empty
+    // User will select the specific resource from the dropdown
     setRemediator({
       ...value,
-      radioOption: RemediatorRadioOption.CUSTOM,
+      radioOption: kind,
       template: getEmptyRemediationTemplate(),
     });
-  };
-
-  const onChange = (kind: RemediatorRadioOption) => {
-    if (kind === RemediatorRadioOption.CUSTOM) {
-      setCustomRemediator();
-    } else {
-      setRemediator({
-        ...value,
-        radioOption: RemediatorRadioOption.SNR,
-        template: snrTemplate,
-      });
-    }
   };
 
   return (
     <RemediatorKindRadioGroup
       fieldName={`${fieldName}.radioOption`}
       onChange={onChange}
-      snrTemplatesExist={!!snrTemplate}
     />
   );
 };

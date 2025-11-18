@@ -1,4 +1,10 @@
-import { FormSection, Skeleton, Text, FormGroup } from "@patternfly/react-core";
+import {
+  FormSection,
+  Skeleton,
+  Text,
+  FormGroup,
+  Alert,
+} from "@patternfly/react-core";
 import { useFormikContext } from "formik";
 import { range } from "lodash";
 import * as React from "react";
@@ -11,6 +17,7 @@ import { useNodeHealthCheckTranslation } from "../../../../localization/useNodeH
 import CheckboxField from "../../../shared/CheckboxField";
 import RemediatorField from "./RemediatorField";
 import RemediatorsArrayField from "./RemediatorsArrayField";
+import useRemediators from "../../../../apis/useRemediators";
 
 const UseEscalatingField = () => {
   const { t } = useNodeHealthCheckTranslation();
@@ -39,9 +46,15 @@ const RemediationTemplateField = ({
   const { t } = useNodeHealthCheckTranslation();
   const { values, setFieldValue } =
     useFormikContext<NodeHealthCheckFormValues>();
+  const remediators = useRemediators();
+
+  // Check if any remediator is installed
+  const hasInstalledRemediator = React.useMemo(() => {
+    return remediators.some((r) => r.installed);
+  }, [remediators]);
 
   React.useEffect(() => {
-    const defaultRemediator = getDefaultRemediator(snrTemplate);
+    const defaultRemediator = getDefaultRemediator(snrTemplate, remediators);
     if (!loaded) {
       return;
     }
@@ -59,17 +72,27 @@ const RemediationTemplateField = ({
     values.formData.escalatingRemediations,
     setFieldValue,
     snrTemplate,
+    remediators,
   ]);
+
   return (
     <FormSection title={t("Remediation")} titleElement="h2">
       <FormGroup>
         <UseEscalatingField />
         {!loaded && <Loading />}
+        {loaded && !hasInstalledRemediator && (
+          <Alert
+            variant="warning"
+            isInline
+            title={t("No remediation operators installed")}
+          >
+            {t(
+              "At least one remediation operator must be installed to configure remediation. Self Node Remediation is recommended as the default option."
+            )}
+          </Alert>
+        )}
         {loaded && !values.formData.useEscalating && (
-          <RemediatorField
-            fieldName={"formData.remediator"}
-            snrTemplate={snrTemplate}
-          />
+          <RemediatorField fieldName={"formData.remediator"} />
         )}
         {loaded && values.formData.useEscalating && (
           <>
@@ -78,7 +101,7 @@ const RemediationTemplateField = ({
                 "Rearrange the templates using drag and drop or by editing the ‘Order’ field. The remediations will be executed in the specified order."
               )}
             </Text>
-            <RemediatorsArrayField snrTemplateResult={snrTemplateResult} />
+            <RemediatorsArrayField />
           </>
         )}
       </FormGroup>

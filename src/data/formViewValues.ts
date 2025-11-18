@@ -9,12 +9,12 @@ import {
   UnhealthyCondition,
   NodeHealthCheck,
   FormViewValues,
-  RemediatorRadioOption,
   RemediationTemplate,
   Remediator,
   NodeHealthCheckSpec,
   EscalatingRemediator,
 } from "./types";
+import { REMEDIATOR_DEFINITIONS } from "./remediators";
 import { MIN_HEALTHY_REGEX } from "./validationSchema";
 import { isEqual } from "lodash-es";
 
@@ -27,9 +27,22 @@ const getRemediationTemplateFormValues = (
   if (!template) {
     return undefined;
   }
-  const radioOption = isEqual(snrTemplate, template)
-    ? RemediatorRadioOption.SNR
-    : RemediatorRadioOption.CUSTOM;
+
+  // Determine which remediator this template belongs to based on its kind
+  let radioOption = "snr"; // Default to snr
+  if (template.kind) {
+    // Find the remediator definition that matches this template's kind
+    const matchingDef = REMEDIATOR_DEFINITIONS.find(
+      (def) => def.templateKind?.kind === template.kind
+    );
+    if (matchingDef) {
+      radioOption = matchingDef.id;
+    } else if (isEqual(snrTemplate, template)) {
+      // Fallback: check if it matches SNR template by content
+      radioOption = "snr";
+    }
+  }
+
   return {
     radioOption,
     template,

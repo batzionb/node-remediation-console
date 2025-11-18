@@ -58,10 +58,6 @@ export const snrTemplateKind: ExtensionK8sModel = {
   version: "v1alpha1",
 };
 
-export const snrTemplateStringKind = getStringKind(snrTemplateKind);
-
-export const getSnrTemplateApiVersion = () => getApiVersion(snrTemplateKind);
-
 export const clusterVersionKind: ExtensionK8sModel = {
   group: "config.openshift.io",
   version: "v1",

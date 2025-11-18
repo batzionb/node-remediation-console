@@ -3,10 +3,10 @@ import {
   NodeHealthCheck,
   RemediationTemplate,
   Remediator,
-  RemediatorRadioOption,
 } from "./types";
 import { snrTemplateKind } from "./model";
 import { TFunction } from "i18next";
+import { RemediatorInfo } from "../apis/useRemediators";
 
 export const getSNRLabel = (t: TFunction) => t("Self node remediation");
 
@@ -38,13 +38,35 @@ export const getRemediatorLabel = (
 };
 
 export const getDefaultRemediator = (
-  snrTemplate: RemediationTemplate | undefined
+  snrTemplate: RemediationTemplate | undefined,
+  remediators?: RemediatorInfo[]
 ): Remediator => {
+  // Prefer SNR if installed
+  const snrRemediator = remediators?.find((r) => r.id === "snr" && r.installed);
+  if (snrRemediator && snrTemplate) {
+    return {
+      radioOption: "snr",
+      template: snrTemplate,
+      order: "",
+      id: Math.random(),
+    };
+  }
+
+  // Fall back to first installed remediator
+  const firstInstalled = remediators?.find((r) => r.installed);
+  if (firstInstalled) {
+    return {
+      radioOption: firstInstalled.id,
+      template: getEmptyRemediationTemplate(),
+      order: "",
+      id: Math.random(),
+    };
+  }
+
+  // If nothing is installed, default to SNR (will be disabled but selected)
   return {
-    radioOption: snrTemplate
-      ? RemediatorRadioOption.SNR
-      : RemediatorRadioOption.CUSTOM,
-    template: snrTemplate ? snrTemplate : getEmptyRemediationTemplate(),
+    radioOption: "snr",
+    template: getEmptyRemediationTemplate(),
     order: "",
     id: Math.random(),
   };

@@ -93,13 +93,18 @@ export enum TimeUnit {
   MilliSecond = "ms",
 }
 
+import { RemediatorRadioOptionId } from "./remediators";
+
+// Keep enum for backward compatibility, but derive from definitions
 export enum RemediatorRadioOption {
   SNR = "snr",
   CUSTOM = "custom",
+  FENCE_AGENT = "fence-agent",
+  MACHINE_DELETION = "machine-deletion",
 }
 
 export type Remediator = {
-  radioOption: RemediatorRadioOption;
+  radioOption: RemediatorRadioOptionId;
   template: RemediationTemplate;
   timeout?: string;
   order: number | "";
